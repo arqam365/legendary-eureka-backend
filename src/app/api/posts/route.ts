@@ -62,3 +62,33 @@ export async function POST(req: NextRequest) {
         )
     }
 }
+
+export async function GET(req: NextRequest) {
+    try {
+        await requireAuth(req)
+
+        const posts = await prisma.blogPost.findMany({
+            where: {
+                deletedAt: null,
+            },
+            orderBy: {
+                updatedAt: 'desc',
+            },
+            select: {
+                id: true,
+                title: true,
+                status: true,
+                visibility: true,
+                updatedAt: true,
+            },
+        })
+
+        return NextResponse.json(posts)
+    } catch (err) {
+        console.error(err)
+        return NextResponse.json(
+            { error: 'Failed to fetch posts' },
+            { status: 500 }
+        )
+    }
+}
