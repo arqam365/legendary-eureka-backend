@@ -18,7 +18,12 @@ export async function OPTIONS() {
 
 export async function POST(request: NextRequest) {
     try {
+        const authHeader = request.headers.get('authorization')
+        console.log('AUTH HEADER:', authHeader)
+
         const user = await verifyAuth(request)
+
+        console.log('USER:', user)
 
         if (!user) {
             return NextResponse.json(
@@ -28,15 +33,11 @@ export async function POST(request: NextRequest) {
         }
 
         return NextResponse.json(
-            {
-                id: user.id,
-                email: user.email,
-                role: user.role,
-            },
+            { id: user.id, email: user.email, role: user.role },
             { headers: corsHeaders }
         )
     } catch (err) {
-        console.error(err)
+        console.error('AUTH FIREBASE ERROR:', err)
         return NextResponse.json(
             { error: 'Auth failed' },
             { status: 500, headers: corsHeaders }
