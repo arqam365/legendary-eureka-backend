@@ -12,13 +12,15 @@ export async function OPTIONS() {
 
 export async function DELETE(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    context: { params: Promise<{ id: string }> }
 ) {
     try {
         await requireAuth(req)
 
+        const { id } = await context.params
+
         await prisma.blogPost.update({
-            where: { id: params.id },
+            where: { id },
             data: { deletedAt: new Date() },
         })
 
