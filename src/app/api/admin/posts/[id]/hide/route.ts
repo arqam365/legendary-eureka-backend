@@ -4,13 +4,14 @@ import { hidePost, unhidePost } from '@/lib/mutations'
 
 export async function POST(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    context: { params: Promise<{ id: string }> }
 ) {
     try {
         const user = await requireAuth(request)
         await requirePermission(user, 'post:hide')
 
-        const post = await hidePost(user, params.id)
+        const { id } = await context.params
+        const post = await hidePost(user, id)
         return NextResponse.json(post)
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 400 })
@@ -19,13 +20,14 @@ export async function POST(
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    context: { params: Promise<{ id: string }> }
 ) {
     try {
         const user = await requireAuth(request)
         await requirePermission(user, 'post:hide')
 
-        const post = await unhidePost(user, params.id)
+        const { id } = await context.params
+        const post = await unhidePost(user, id)
         return NextResponse.json(post)
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 400 })

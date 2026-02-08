@@ -3,10 +3,11 @@ import { getPublishedPostBySlug } from '@/lib/queries'
 
 export async function GET(
     request: Request,
-    { params }: { params: { slug: string } }
+    context: { params: Promise<{ slug: string }> }
 ) {
     try {
-        const post = await getPublishedPostBySlug(params.slug)
+        const { slug } = await context.params
+        const post = await getPublishedPostBySlug(slug)
 
         if (!post) {
             return NextResponse.json({ error: 'Post not found' }, { status: 404 })
