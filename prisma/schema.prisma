@@ -1,0 +1,149 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==========================================
+// USER MANAGEMENT
+// ==========================================
+
+model User {
+  id       String   @id @default(cuid())
+  authUid  String   @unique // Firebase UID
+  email    String   @unique
+  name     String
+  role     UserRole @default(EDITOR)
+  status   UserStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  posts      BlogPost[]
+  auditLogs  AuditLog[]
+
+  @@index([authUid])
+  @@index([email])
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  EDITOR
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
+}
+
+// ==========================================
+// CONTENT
+// ==========================================
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+
+  // Content
+  title       String
+  description String   @db.Text
+  contentHtml String   @db.Text
+  contentJson Json?    // Tiptap format for future
+  coverImage  String?
+
+  // Taxonomy
+  category    PostCategory
+  tags        String[]     @default([])
+
+  // Lifecycle
+  status      PostStatus   @default(DRAFT)
+  visibility  PostVisibility @default(PUBLIC)
+  deletedAt   DateTime?
+
+  // Publishing
+  authorId    String
+  author      User         @relation(fields: [authorId], references: [id])
+  publishedAt DateTime?
+
+  // SEO
+  metaTitle       String?
+  metaDescription String?
+
+  // Metadata
+  readTime    Int?     // minutes
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([status, visibility, deletedAt])
+  @@index([authorId])
+  @@index([category])
+  @@index([publishedAt])
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum PostVisibility {
+  PUBLIC
+  HIDDEN
+}
+
+enum PostCategory {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+// ==========================================
+// AUDIT LOGGING
+// ==========================================
+
+model AuditLog {
+  id         String   @id @default(cuid())
+
+  // Actor
+  actorId    String
+  actor      User     @relation(fields: [actorId], references: [id])
+
+  // Action
+  action     String   // "post:publish", "user:invite", etc.
+  targetType String   // "post", "user"
+  targetId   String
+  metadata   Json?    // Additional context
+
+  createdAt  DateTime @default(now())
+
+  @@index([actorId])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+}
+
+// ==========================================
+// PERMISSIONS (Future-proof)
+// ==========================================
+
+model RolePermission {
+  id         String   @id @default(cuid())
+  role       UserRole
+  permission String   // "post:create", "post:publish", "user:invite"
+
+  createdAt DateTime @default(now())
+
+  @@unique([role, permission])
+}
