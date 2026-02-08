@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
                 status: status.toUpperCase(),
                 visibility: visibility.toUpperCase(),
                 authorId: user.id,
-                publishedAt: status === 'published' ? new Date() : null,
+                publishedAt: status.toUpperCase() === 'PUBLISHED' ? new Date() : null,
             },
         })
 
