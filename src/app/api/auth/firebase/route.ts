@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyAuth } from '@/lib/auth'
-
-const corsHeaders = {
-    'Access-Control-Allow-Origin': 'http://localhost:3000',
-    'Access-Control-Allow-Credentials': 'true',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-}
+import {corsHeaders} from "@/lib/cors";
 
 // 🔴 THIS IS REQUIRED FOR PREFLIGHT
 export async function OPTIONS() {
