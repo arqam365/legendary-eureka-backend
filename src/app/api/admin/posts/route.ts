@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth, requirePermission } from '@/lib/auth'
 import { getAllPostsAdmin } from '@/lib/queries'
 import { createPost } from '@/lib/mutations'
+import { corsHeaders } from '@/lib/cors'
+
+export async function OPTIONS() {
+    return new NextResponse(null, { status: 204, headers: corsHeaders })
+}
 
 export async function GET(request: NextRequest) {
     try {

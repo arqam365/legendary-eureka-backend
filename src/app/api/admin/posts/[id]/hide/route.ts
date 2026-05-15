@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth, requirePermission } from '@/lib/auth'
 import { hidePost, unhidePost } from '@/lib/mutations'
+import { corsHeaders } from '@/lib/cors'
+
+export async function OPTIONS() {
+    return new NextResponse(null, { status: 204, headers: corsHeaders })
+}
 
 export async function POST(
     request: NextRequest,
