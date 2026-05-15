@@ -39,9 +39,10 @@ export async function createPost(actor: User, data: CreatePostInput) {
             slug,
             authorId: actor.id,
             category: data.category as PostCategory,
-            status: PostStatus.DRAFT,
-            visibility: PostVisibility.PUBLIC,
+            status: (data.status as PostStatus) ?? PostStatus.DRAFT,
+            visibility: (data.visibility as PostVisibility) ?? PostVisibility.PUBLIC,
             tags: data.tags || [],
+            publishedAt: data.status === PostStatus.PUBLISHED ? new Date() : null,
         }
     })
 

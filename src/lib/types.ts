@@ -11,6 +11,9 @@ export type CreatePostInput = {
     coverImage?: string
     category: string
     tags?: string[]
+    status?: string
+    visibility?: string
+    readTime?: number | null
     metaTitle?: string
     metaDescription?: string
 }
